@@ -10,6 +10,7 @@ import {
   buildExplainerUserPayload
 } from '../lib/llm/prompts'
 import { shapeChartData } from '../lib/chartShape'
+import { jsonSafe } from '../lib/jsonSafe'
 import type { ChartSpec } from '../lib/types'
 
 const MAX_ROWS = 5000
@@ -48,11 +49,15 @@ export default defineEventHandler(async (event) => {
           rowCount: rec.rowCount
         }) }
       ])
+
+
+      console.log(plannerRaw)
+      
       parsed = PlanSchema.parse(parseJson(plannerRaw)) as typeof parsed
     } catch (_retryErr) {
       throw createError({
         statusCode: 502,
-        message: 'LLM plan invalid or unavailable'
+        message: 'LLM plan invalid or unavailable: ' + _retryErr
       })
     }
   }
@@ -83,7 +88,7 @@ export default defineEventHandler(async (event) => {
 
   let data: Record<string, unknown>[]
   try {
-    data = await runQuery(rec.dbPath, sql, { maxRows: MAX_ROWS })
+    data = jsonSafe(await runQuery(rec.dbPath, sql, { maxRows: MAX_ROWS }))
   } catch (err) {
     throw createError({
       statusCode: 400,

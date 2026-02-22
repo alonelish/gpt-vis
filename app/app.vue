@@ -48,8 +48,8 @@ useSeoMeta({
       </template>
     </UHeader>
 
-    <UMain>
-      <NuxtPage />
+    <UMain class="flex flex-1 flex-col min-h-0">
+      <NuxtPage class="flex flex-1 flex-col min-h-0" />
     </UMain>
 
     <USeparator icon="i-simple-icons-nuxtdotjs" />

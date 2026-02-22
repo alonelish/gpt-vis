@@ -1,24 +1,287 @@
 <script setup lang="ts">
+import type { ChatResponse, ChatResponseSuccess } from '~/types'
+import { isClarification } from '~/types'
+
+type Message = {
+  role: 'user' | 'assistant'
+  text: string
+  sql?: string
+  chartSpec?: ChatResponseSuccess['chartSpec']
+  data?: ChatResponseSuccess['data']
+  warnings?: string[]
+  suggestedQuestions?: string[]
+}
+
 const datasetId = ref<string | null>(null)
 const rowCount = ref<number | null>(null)
+const fileName = ref<string | null>(null)
+const messages = ref<Message[]>([])
+const inputText = ref('')
+const loading = ref(false)
+const uploading = ref(false)
+const fileInput = ref<HTMLInputElement | null>(null)
+const messagesEnd = ref<HTMLElement | null>(null)
 
-function onUploaded(id: string, count: number) {
-  datasetId.value = id
-  rowCount.value = count
+function scrollToBottom() {
+  nextTick(() => {
+    messagesEnd.value?.scrollIntoView({ behavior: 'smooth' })
+  })
+}
+
+function hasRealMessages(): boolean {
+  return messages.value.some((m) => m.role === 'user' || (m.role === 'assistant' && m.suggestedQuestions == null))
+}
+
+async function handleUpload(e: Event) {
+  const target = e.target as HTMLInputElement
+  const file = target.files?.[0]
+  if (!file) return
+  if (!file.name.toLowerCase().endsWith('.csv')) {
+    messages.value.push({
+      role: 'assistant',
+      text: 'Please select a CSV file.'
+    })
+    scrollToBottom()
+    target.value = ''
+    return
+  }
+  uploading.value = true
+  try {
+    const form = new FormData()
+    form.append('file', file)
+    const res = await $fetch<{ id: string; rowCount: number }>('/api/datasets', {
+      method: 'POST',
+      body: form
+    })
+    datasetId.value = res.id
+    rowCount.value = res.rowCount
+    fileName.value = file.name
+    messages.value = []
+    target.value = ''
+  } catch (err: unknown) {
+    const msg =
+      err &&
+      typeof err === 'object' &&
+      'data' in err &&
+      typeof (err as { data: { message?: string } }).data?.message === 'string'
+        ? (err as { data: { message: string } }).data.message
+        : 'Upload failed'
+    messages.value.push({ role: 'assistant', text: msg })
+    scrollToBottom()
+  } finally {
+    uploading.value = false
+  }
+}
+
+function triggerFileInput() {
+  fileInput.value?.click()
+}
+
+function setQuestionAndSubmit(question: string) {
+  submit(question)
+}
+
+async function submit(questionOverride?: string) {
+  const text = (questionOverride ?? inputText.value).trim()
+  if (questionOverride) inputText.value = ''
+
+  if (!datasetId.value) {
+    messages.value.push({
+      role: 'assistant',
+      text: 'Upload a CSV file to ask questions about it.'
+    })
+    inputText.value = ''
+    scrollToBottom()
+    return
+  }
+
+  if (text) {
+    messages.value.push({ role: 'user', text })
+    if (!questionOverride) inputText.value = ''
+    loading.value = true
+    scrollToBottom()
+    try {
+      const res = await $fetch<ChatResponse>('/api/chat', {
+        method: 'POST',
+        body: { datasetId: datasetId.value, question: text }
+      })
+      if (isClarification(res)) {
+        messages.value.push({ role: 'assistant', text: res.clarificationQuestion })
+      } else {
+        messages.value.push({
+          role: 'assistant',
+          text: res.answerText,
+          sql: res.sql,
+          chartSpec: res.chartSpec,
+          data: res.data,
+          warnings: res.warnings
+        })
+      }
+    } catch (err: unknown) {
+      const msg =
+        err &&
+        typeof err === 'object' &&
+        'data' in err &&
+        typeof (err as { data: { message?: string } }).data?.message === 'string'
+          ? (err as { data: { message: string } }).data.message
+          : 'Request failed'
+      messages.value.push({ role: 'assistant', text: msg })
+    } finally {
+      loading.value = false
+      scrollToBottom()
+    }
+    return
+  }
+
+  if (!hasRealMessages()) {
+    loading.value = true
+    scrollToBottom()
+    try {
+      const res = await $fetch<{ questions: string[] }>(
+        `/api/datasets/${datasetId.value}/suggest-questions`,
+        { method: 'POST' }
+      )
+      messages.value.push({
+        role: 'assistant',
+        text: 'What would you like to ask?',
+        suggestedQuestions: res.questions
+      })
+    } catch (err: unknown) {
+      const msg =
+        err &&
+        typeof err === 'object' &&
+        'data' in err &&
+        typeof (err as { data: { message?: string } }).data?.message === 'string'
+          ? (err as { data: { message: string } }).data.message
+          : 'Could not load suggestions'
+      messages.value.push({ role: 'assistant', text: msg })
+    } finally {
+      loading.value = false
+      scrollToBottom()
+    }
+  }
+}
+
+function onEnter(e: KeyboardEvent) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault()
+    submit()
+  }
 }
 </script>
 
 <template>
-  <div class="container mx-auto px-4 py-6 max-w-4xl">
-    <h1 class="text-2xl font-bold mb-6">
-      CSV QA + Visualization
-    </h1>
-    <div class="grid gap-6 md:grid-cols-1">
-      <UploadPanel @uploaded="onUploaded" />
-      <div v-if="datasetId" class="text-sm text-muted">
-        Dataset loaded ({{ rowCount?.toLocaleString() ?? 0 }} rows). Ask a question below.
+  <div class="flex flex-1 flex-col min-h-0 w-full max-w-3xl mx-auto">
+    <div class="flex-1 overflow-y-auto px-4 py-6 space-y-6">
+      <div
+        v-for="(msg, i) in messages"
+        :key="i"
+        class="flex"
+        :class="msg.role === 'user' ? 'justify-end' : 'justify-start'"
+      >
+        <div
+          class="rounded-2xl px-4 py-3 max-w-[85%]"
+          :class="
+            msg.role === 'user'
+              ? 'bg-green-100 text-green-900 dark:bg-green-900/30 dark:text-green-100'
+              : 'bg-muted/60'
+          "
+        >
+          <p class="text-sm font-medium mb-4">
+            {{ msg.role === 'user' ? 'You' : 'Assistant' }}
+          </p>
+          <ClientOnly>
+            <ChartRenderer
+              v-if="msg.role === 'assistant' && msg.chartSpec && msg.data && msg.data.length > 0"
+              :data="msg.data"
+              :chart-spec="msg.chartSpec"
+              class="mt-4 mb-5 min-h-[200px]"
+            />
+            <template #fallback>
+              <div
+                v-if="msg.role === 'assistant' && msg.chartSpec && msg.data?.length"
+                class="mt-4 mb-5 min-h-[200px] rounded bg-black/5 dark:bg-white/5 flex items-center justify-center text-sm opacity-70"
+              >
+                Loading chart…
+              </div>
+            </template>
+          </ClientOnly>
+          <p class="text-sm whitespace-pre-wrap mt-4">
+            {{ msg.text }}
+          </p>
+          <ul
+            v-if="msg.suggestedQuestions?.length"
+            class="mt-4 list-disc list-inside space-y-1.5 text-sm"
+          >
+            <li
+              v-for="(q, j) in msg.suggestedQuestions"
+              :key="j"
+              class="cursor-pointer hover:underline"
+              :class="loading ? 'pointer-events-none opacity-60 cursor-not-allowed' : ''"
+              @click="!loading && setQuestionAndSubmit(q)"
+            >
+              {{ q }}
+            </li>
+          </ul>
+          <p v-if="msg.warnings?.length" class="text-xs mt-3 opacity-80">
+            {{ msg.warnings.join(' ') }}
+          </p>
+        </div>
       </div>
-      <ChatPanel :dataset-id="datasetId" />
+      <div v-if="loading" class="flex justify-start">
+        <div class="rounded-2xl px-4 py-3 bg-muted/60">
+          <p class="text-sm opacity-70">Thinking…</p>
+        </div>
+      </div>
+      <div ref="messagesEnd" />
+    </div>
+
+    <div class="shrink-0 px-4 pb-6 pt-2">
+      <div
+        class="flex items-center gap-2 rounded-2xl border border-default bg-muted/30 px-3 py-2 focus-within:ring-2 focus-within:ring-primary/50"
+      >
+        <input
+          ref="fileInput"
+          type="file"
+          accept=".csv"
+          class="hidden"
+          @change="handleUpload"
+        >
+        <UButton
+          icon="i-lucide-file-spreadsheet"
+          color="neutral"
+          variant="ghost"
+          size="sm"
+          :loading="uploading"
+          :disabled="loading"
+          aria-label="Upload CSV"
+          @click="triggerFileInput"
+        />
+        <span
+          v-if="fileName"
+          class="text-xs text-muted truncate max-w-[8rem]"
+          :title="fileName"
+        >
+          {{ fileName }}
+        </span>
+        <input
+          v-model="inputText"
+          type="text"
+          class="flex-1 min-w-0 bg-transparent border-0 outline-none px-2 py-1.5 text-sm placeholder:text-muted"
+          placeholder="Ask about your data…"
+          :disabled="loading"
+          @keydown="onEnter"
+        >
+        <UButton
+          icon="i-lucide-send"
+          color="primary"
+          variant="ghost"
+          size="sm"
+          :disabled="loading || uploading"
+          aria-label="Send"
+          @click="() => submit()"
+        />
+      </div>
     </div>
   </div>
 </template>
