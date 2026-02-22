@@ -38,7 +38,7 @@ const ChartSpecRawSchema = z.object({
 export const PlanSchema = z.union([
   z.object({
     needsClarification: z.literal(true),
-    clarificationQuestion: z.string().min(5).max(200)
+    clarificationQuestion: z.string().min(5).max(600)
   }),
   z.object({
     needsClarification: z.literal(false),

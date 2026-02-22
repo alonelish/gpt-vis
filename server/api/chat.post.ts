@@ -49,10 +49,6 @@ export default defineEventHandler(async (event) => {
           rowCount: rec.rowCount
         }) }
       ])
-
-
-      console.log(plannerRaw)
-      
       parsed = PlanSchema.parse(parseJson(plannerRaw)) as typeof parsed
     } catch (_retryErr) {
       throw createError({

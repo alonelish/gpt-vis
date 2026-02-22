@@ -28,6 +28,18 @@ export async function callOpenRouter(messages: Message[]): Promise<string> {
 }
 
 export function parseJson<T>(text: string): T {
-  const trimmed = text.trim().replace(/^```\w*\n?|\n?```$/g, '')
+  let trimmed = text.trim().replace(/^```\w*\n?|\n?```$/g, '').trim()
+  if (trimmed.startsWith('"') && trimmed.endsWith('"') && trimmed.length > 1) {
+    try {
+      const inner = JSON.parse(trimmed) as unknown
+      if (typeof inner === 'string') trimmed = inner.trim()
+    } catch (_) {}
+  }
+  if (trimmed.startsWith('"') && trimmed.length > 1 && !trimmed.startsWith('"{"')) {
+    trimmed = trimmed.replace(/^"\s*/, '').trim()
+  }
+  if (!trimmed.startsWith('{') && trimmed.includes('needsClarification')) {
+    trimmed = '{' + trimmed + '}'
+  }
   return JSON.parse(trimmed) as T
 }

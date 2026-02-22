@@ -171,7 +171,7 @@ function onEnter(e: KeyboardEvent) {
 </script>
 
 <template>
-  <div class="flex flex-1 flex-col min-h-0 w-full max-w-3xl mx-auto">
+  <div class="flex flex-1 flex-col min-h-0 w-full max-w-3xl mx-auto h-full">
     <div class="flex-1 overflow-y-auto px-4 py-6 space-y-6">
       <div
         v-for="(msg, i) in messages"
@@ -229,16 +229,17 @@ function onEnter(e: KeyboardEvent) {
         </div>
       </div>
       <div v-if="loading" class="flex justify-start">
-        <div class="rounded-2xl px-4 py-3 bg-muted/60">
+        <div class="rounded-2xl px-4 py-3 bg-muted/60 flex items-center gap-2">
+          <UIcon name="i-lucide-loader-2" class="size-4 animate-spin opacity-70" />
           <p class="text-sm opacity-70">Thinking…</p>
         </div>
       </div>
       <div ref="messagesEnd" />
     </div>
 
-    <div class="shrink-0 px-4 pb-6 pt-2">
+    <div class="sticky bottom-0 shrink-0 px-4 pb-6 pt-4 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
       <div
-        class="flex items-center gap-2 rounded-2xl border border-default bg-muted/30 px-3 py-2 focus-within:ring-2 focus-within:ring-primary/50"
+        class="flex items-center gap-3 rounded-2xl border border-default bg-muted/30 px-4 py-4 focus-within:ring-2 focus-within:ring-primary/50"
       >
         <input
           ref="fileInput"
@@ -251,10 +252,11 @@ function onEnter(e: KeyboardEvent) {
           icon="i-lucide-file-spreadsheet"
           color="neutral"
           variant="ghost"
-          size="sm"
+          size="lg"
           :loading="uploading"
           :disabled="loading"
           aria-label="Upload CSV"
+          class="[&_svg]:size-6"
           @click="triggerFileInput"
         />
         <span
@@ -267,7 +269,7 @@ function onEnter(e: KeyboardEvent) {
         <input
           v-model="inputText"
           type="text"
-          class="flex-1 min-w-0 bg-transparent border-0 outline-none px-2 py-1.5 text-sm placeholder:text-muted"
+          class="flex-1 min-w-0 bg-transparent border-0 outline-none px-2 py-2 text-sm placeholder:text-muted"
           placeholder="Ask about your data…"
           :disabled="loading"
           @keydown="onEnter"
@@ -276,7 +278,7 @@ function onEnter(e: KeyboardEvent) {
           icon="i-lucide-send"
           color="primary"
           variant="ghost"
-          size="sm"
+          size="md"
           :disabled="loading || uploading"
           aria-label="Send"
           @click="() => submit()"
