@@ -3,10 +3,10 @@ import { writeFile, unlink } from 'node:fs/promises'
 import { join } from 'node:path'
 import { mkdir } from 'node:fs/promises'
 import * as datasetStore from '../lib/datasetStore'
-import { ensureDataDir } from '../lib/duckdb/open'
-import { ingestCsv } from '../lib/duckdb/ingest'
-import { getSchema } from '../lib/duckdb/schema'
-import { getRowCount } from '../lib/duckdb/profile'
+import { ensureDataDir, openDb, closeDb } from '../lib/duckdb/open'
+import { ingestWithDb } from '../lib/duckdb/ingest'
+import { getSchemaFromDb } from '../lib/duckdb/schema'
+import { getRowCountFromDb } from '../lib/duckdb/profile'
 
 const UPLOAD_DIR = join(process.cwd(), '.data', 'uploads')
 
@@ -24,11 +24,16 @@ export default defineEventHandler(async (event) => {
     await writeFile(filePath, file.data)
     await ensureDataDir()
     datasetStore.create(id, filePath, dbPath)
-    await ingestCsv(dbPath, filePath)
-    const schema = await getSchema(dbPath)
-    const rowCount = await getRowCount(dbPath)
-    datasetStore.setReady(id, schema, rowCount)
-    return { id, schema, rowCount }
+    const db = await openDb(dbPath)
+    try {
+      await ingestWithDb(db, filePath)
+      const schema = await getSchemaFromDb(db)
+      const rowCount = await getRowCountFromDb(db)
+      datasetStore.setReady(id, schema, rowCount)
+      return { id, schema, rowCount }
+    } finally {
+      await closeDb(db)
+    }
   } catch (err) {
     try {
       await unlink(filePath).catch(() => {})

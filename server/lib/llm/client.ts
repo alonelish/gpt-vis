@@ -15,6 +15,8 @@ export async function callOpenRouter(messages: Message[]): Promise<string> {
     },
     body: JSON.stringify({ model, messages })
   })
+
+  
   if (!res.ok) {
     const text = await res.text()
     throw new Error(`OpenRouter error ${res.status}: ${text}`)

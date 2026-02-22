@@ -1,0 +1,31 @@
+order_id,customer_id,order_date,country,city,product_category,product_name,quantity,unit_price,total_amount,payment_method,status
+1001,5001,2024-01-03,US,New York,Electronics,Wireless Headphones,2,89.99,179.98,Credit Card,Completed
+1002,5002,2024-01-04,US,Chicago,Home,Air Fryer,1,129.00,129.00,PayPal,Completed
+1003,5003,2024-01-05,UK,London,Electronics,Bluetooth Speaker,3,49.99,149.97,Credit Card,Completed
+1004,5004,2024-01-07,IL,Tel Aviv,Books,Productivity Book,2,24.50,49.00,Credit Card,Completed
+1005,5005,2024-01-10,DE,Berlin,Fashion,Running Shoes,1,159.00,159.00,PayPal,Completed
+1006,5006,2024-01-12,US,Los Angeles,Electronics,Laptop Stand,2,39.99,79.98,Credit Card,Completed
+1007,5007,2024-01-15,FR,Paris,Beauty,Skincare Set,1,89.00,89.00,Debit Card,Completed
+1008,5008,2024-01-17,IL,Haifa,Home,Coffee Machine,1,249.99,249.99,Credit Card,Completed
+1009,5009,2024-01-19,US,Houston,Electronics,Smartwatch,1,199.00,199.00,PayPal,Completed
+1010,5010,2024-01-22,UK,Manchester,Fashion,Jacket,2,120.00,240.00,Credit Card,Completed
+1011,5011,2024-02-02,US,New York,Electronics,Tablet,1,399.00,399.00,Credit Card,Completed
+1012,5012,2024-02-05,IL,Jerusalem,Books,Cooking Guide,3,29.90,89.70,Debit Card,Completed
+1013,5013,2024-02-07,DE,Hamburg,Home,Vacuum Cleaner,1,199.99,199.99,PayPal,Completed
+1014,5014,2024-02-10,FR,Lyon,Beauty,Perfume,2,75.00,150.00,Credit Card,Completed
+1015,5015,2024-02-12,US,Chicago,Fashion,Sneakers,1,140.00,140.00,Credit Card,Completed
+1016,5016,2024-02-14,UK,London,Electronics,Webcam,2,69.99,139.98,Debit Card,Completed
+1017,5017,2024-02-18,IL,Tel Aviv,Electronics,Keyboard,3,49.99,149.97,Credit Card,Completed
+1018,5018,2024-02-20,US,Miami,Beauty,Hair Dryer,1,59.99,59.99,PayPal,Completed
+1019,5019,2024-02-25,DE,Berlin,Books,Finance Book,2,34.99,69.98,Credit Card,Completed
+1020,5020,2024-03-01,FR,Paris,Home,Blender,1,89.00,89.00,Credit Card,Completed
+1021,5021,2024-03-03,US,Boston,Electronics,Monitor,1,299.00,299.00,Credit Card,Completed
+1022,5022,2024-03-06,IL,Haifa,Fashion,T-Shirt,4,25.00,100.00,Debit Card,Completed
+1023,5023,2024-03-08,UK,London,Electronics,Mouse,5,19.99,99.95,PayPal,Completed
+1024,5024,2024-03-10,US,San Francisco,Home,Desk Lamp,2,45.00,90.00,Credit Card,Completed
+1025,5025,2024-03-12,DE,Cologne,Beauty,Face Cream,1,49.99,49.99,Credit Card,Completed
+1026,5026,2024-03-15,FR,Nice,Electronics,Headset,1,129.00,129.00,PayPal,Completed
+1027,5027,2024-03-17,US,Seattle,Books,Marketing Book,2,39.00,78.00,Credit Card,Completed
+1028,5028,2024-03-20,IL,Jerusalem,Home,Toaster,1,39.99,39.99,Credit Card,Completed
+1029,5029,2024-03-23,UK,Birmingham,Fashion,Hat,3,29.00,87.00,Debit Card,Completed
+1030,5030,2024-03-25,US,Denver,Electronics,Smartphone,1,899.00,899.00,Credit Card,Completed

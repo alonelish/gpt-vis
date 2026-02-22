@@ -2,7 +2,7 @@ import * as datasetStore from '../lib/datasetStore'
 import { runQuery } from '../lib/duckdb/query'
 import { guardSql, maybeAppendLimit } from '../lib/security/sqlGuard'
 import { callOpenRouter, parseJson } from '../lib/llm/client'
-import { PlanSchema } from '../lib/llm/schemas'
+import { PlanSchema, normalizeChartSpec } from '../lib/llm/schemas'
 import {
   PLANNER_SYSTEM,
   EXPLAINER_SYSTEM,
@@ -49,7 +49,7 @@ export default defineEventHandler(async (event) => {
         }) }
       ])
       parsed = PlanSchema.parse(parseJson(plannerRaw)) as typeof parsed
-    } catch (retryErr) {
+    } catch (_retryErr) {
       throw createError({
         statusCode: 502,
         message: 'LLM plan invalid or unavailable'
@@ -63,6 +63,16 @@ export default defineEventHandler(async (event) => {
 
   if (!parsed.sql || !parsed.chartSpec) {
     throw createError({ statusCode: 502, message: 'LLM did not return SQL and chartSpec' })
+  }
+
+  let chartSpec: ChartSpec
+  try {
+    chartSpec = normalizeChartSpec(parsed.chartSpec)
+  } catch (err) {
+    throw createError({
+      statusCode: 502,
+      message: err instanceof Error ? err.message : 'Invalid chartSpec from LLM'
+    })
   }
 
   const guard = guardSql(parsed.sql)
@@ -86,19 +96,19 @@ export default defineEventHandler(async (event) => {
       answerText: 'No rows match your question. Try rephrasing or relaxing filters.',
       sql,
       data: [],
-      chartSpec: parsed.chartSpec,
+      chartSpec,
       warnings: ['No data returned']
     }
   }
 
-  const shaped = shapeChartData(data, parsed.chartSpec)
+  const shaped = shapeChartData(data, chartSpec)
   let answerText: string
   try {
     answerText = await callOpenRouter([
       { role: 'system', content: EXPLAINER_SYSTEM },
       { role: 'user', content: buildExplainerUserPayload({
         question,
-        chartSpec: parsed.chartSpec as Record<string, unknown>,
+        chartSpec: chartSpec as Record<string, unknown>,
         computedData: shaped
       }) }
     ])
@@ -110,6 +120,6 @@ export default defineEventHandler(async (event) => {
     answerText,
     sql,
     data: shaped,
-    chartSpec: parsed.chartSpec
+    chartSpec
   }
 })
