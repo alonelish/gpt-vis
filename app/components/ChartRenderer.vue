@@ -110,6 +110,6 @@ watch([() => props.data, () => props.chartSpec], () => {
   <div
     v-else
     ref="chartEl"
-    class="w-full min-h-[200px]"
+    class="w-full min-h-[360px]"
   />
 </template>

@@ -195,18 +195,18 @@ function onEnter(e: KeyboardEvent) {
               v-if="msg.role === 'assistant' && msg.chartSpec && msg.data && msg.data.length > 0"
               :data="msg.data"
               :chart-spec="msg.chartSpec"
-              class="mt-4 mb-5 min-h-[200px]"
+              class="mt-4 min-h-[360px]"
             />
             <template #fallback>
               <div
                 v-if="msg.role === 'assistant' && msg.chartSpec && msg.data?.length"
-                class="mt-4 mb-5 min-h-[200px] rounded bg-black/5 dark:bg-white/5 flex items-center justify-center text-sm opacity-70"
+                class="mt-4 mb-5 min-h-[360px] rounded bg-black/5 dark:bg-white/5 flex items-center justify-center text-sm opacity-70"
               >
                 Loading chart…
               </div>
             </template>
           </ClientOnly>
-          <p class="text-sm whitespace-pre-wrap mt-4">
+          <p class="text-sm whitespace-pre-wrap mt-2">
             {{ msg.text }}
           </p>
           <ul
@@ -216,7 +216,7 @@ function onEnter(e: KeyboardEvent) {
             <li
               v-for="(q, j) in msg.suggestedQuestions"
               :key="j"
-              class="cursor-pointer hover:underline"
+              class="cursor-pointer hover:underline text-green-600 dark:text-green-400"
               :class="loading ? 'pointer-events-none opacity-60 cursor-not-allowed' : ''"
               @click="!loading && setQuestionAndSubmit(q)"
             >
