@@ -1,7 +1,6 @@
 import { randomUUID } from 'node:crypto'
-import { writeFile, unlink } from 'node:fs/promises'
+import { writeFile, unlink, mkdir } from 'node:fs/promises'
 import { join } from 'node:path'
-import { mkdir } from 'node:fs/promises'
 import * as datasetStore from '../lib/datasetStore'
 import { ensureDataDir, openDb, closeDb, withDbLock } from '../lib/duckdb/open'
 import { ingestWithDb } from '../lib/duckdb/ingest'
@@ -41,7 +40,7 @@ export default defineEventHandler(async (event) => {
     try {
       await unlink(filePath).catch(() => {})
       await unlink(dbPath).catch(() => {})
-    } catch (_) {}
+    } catch { /* ignore cleanup errors */ }
     throw createError({
       statusCode: 500,
       message: err instanceof Error ? err.message : 'Upload failed'

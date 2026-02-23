@@ -39,7 +39,7 @@ export default defineEventHandler(async (event) => {
       }) }
     ])
     parsed = PlanSchema.parse(parseJson(plannerRaw)) as typeof parsed
-  } catch (_e) {
+  } catch {
     try {
       plannerRaw = await callOpenRouter([
         { role: 'system', content: PLANNER_SYSTEM },
@@ -113,7 +113,7 @@ export default defineEventHandler(async (event) => {
         computedData: shaped
       }) }
     ])
-  } catch (_) {
+  } catch {
     answerText = 'Results are ready. See the chart and data below.'
   }
 

@@ -33,7 +33,7 @@ export function parseJson<T>(text: string): T {
     try {
       const inner = JSON.parse(trimmed) as unknown
       if (typeof inner === 'string') trimmed = inner.trim()
-    } catch (_) {}
+    } catch { /* ignore parse error, use trimmed as-is */ }
   }
   if (trimmed.startsWith('"') && trimmed.length > 1 && !trimmed.startsWith('"{"')) {
     trimmed = trimmed.replace(/^"\s*/, '').trim()
