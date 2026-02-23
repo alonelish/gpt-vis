@@ -11,7 +11,7 @@ export function guardSql(sql: string): GuardResult {
     return { allowed: false, error: 'Only SELECT queries are allowed' }
   }
   const beforeSemicolon = trimmed.split(';')[0]
-  if (trimmed.includes(';') && beforeSemicolon?.trim().length > 0) {
+  if (trimmed.includes(';') && (beforeSemicolon?.trim() ?? '').length > 0) {
     const rest = trimmed.slice(trimmed.indexOf(';') + 1).trim()
     if (rest.length > 0) return { allowed: false, error: 'Multiple statements not allowed' }
   }
