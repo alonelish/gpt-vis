@@ -58,6 +58,31 @@ async function handleUpload(e: Event) {
     fileName.value = file.name
     messages.value = []
     target.value = ''
+    loading.value = true
+    scrollToBottom()
+    try {
+      const suggestRes = await $fetch<{ questions: string[] }>(
+        `/api/datasets/${res.id}/suggest-questions`,
+        { method: 'POST' }
+      )
+      messages.value.push({
+        role: 'assistant',
+        text: 'What would you like to ask?',
+        suggestedQuestions: suggestRes.questions
+      })
+    } catch (suggestErr: unknown) {
+      const suggestMsg =
+        suggestErr &&
+        typeof suggestErr === 'object' &&
+        'data' in suggestErr &&
+        typeof (suggestErr as { data: { message?: string } }).data?.message === 'string'
+          ? (suggestErr as { data: { message: string } }).data.message
+          : 'Could not load suggestions'
+      messages.value.push({ role: 'assistant', text: suggestMsg })
+    } finally {
+      loading.value = false
+      scrollToBottom()
+    }
   } catch (err: unknown) {
     const msg =
       err &&
@@ -134,6 +159,11 @@ async function submit(questionOverride?: string) {
   }
 
   if (!hasRealMessages()) {
+    const alreadyHasSuggestions = messages.value.some((m) => m.suggestedQuestions?.length)
+    if (alreadyHasSuggestions) {
+      scrollToBottom()
+      return
+    }
     loading.value = true
     scrollToBottom()
     try {
@@ -223,6 +253,12 @@ function onEnter(e: KeyboardEvent) {
               {{ q }}
             </li>
           </ul>
+          <p
+            v-if="msg.suggestedQuestions?.length"
+            class="text-sm mt-3 opacity-80"
+          >
+            Or, ask your own questions below…
+          </p>
           <p v-if="msg.warnings?.length" class="text-xs mt-3 opacity-80">
             {{ msg.warnings.join(' ') }}
           </p>

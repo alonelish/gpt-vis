@@ -48,14 +48,16 @@ Return one of:
 }
 Use xKey and yKey matching your SQL column/alias names. Always include type, title, xKey, and yKey.`
 
-export const SUGGEST_QUESTIONS_SYSTEM = `You are a data analyst. Given a dataset schema and row count, suggest exactly 3 short questions. Each question must be simple enough for a single chart with ONE dimension (or time) and ONE measure.
+export const SUGGEST_QUESTIONS_SYSTEM = `You are a data analyst. Given a dataset schema and row count, suggest exactly 3 short phrases (not full sentences). Each phrase must be simple enough for a single chart with ONE dimension (or time) and ONE measure.
+
+Format: Use very short phrases like "Top 5 products by revenue" or "Revenue share by category". Do NOT use full questions (no "What are the...?", "How did...?"). Do NOT end with a question mark.
 
 Rules:
-- Question 1: Must be answerable with a simple BAR chart (one category axis, one value axis). E.g. "What are the top 5 products by revenue?" or "Which region has the most customers?"
-- Question 2: Must be answerable with a simple PIE chart (one category, one aggregated value for share). E.g. "What is the share of revenue by product category?" or "Break down subscriptions by plan as a pie chart."
-- Question 3: Must be answerable with a simple LINE chart (one time/date dimension, one value). E.g. "How did sales change over time?" or "Show monthly revenue trend." If the data has no date/time column, use a BAR question instead (e.g. "Which month had the highest orders?").
+- Phrase 1: Must be answerable with a simple BAR chart (one category axis, one value axis). E.g. "Top 5 products by revenue" or "Regions by customer count"
+- Phrase 2: Must be answerable with a simple PIE chart (one category, one aggregated value for share). E.g. "Revenue share by product category" or "Subscriptions by plan"
+- Phrase 3: Must be answerable with a simple LINE chart (one time/date dimension, one value). E.g. "Sales over time" or "Monthly revenue trend". If the data has no date/time column, use a BAR phrase instead (e.g. "Orders by month").
 
-Do NOT suggest questions that need two dimensions, crosstabs, or complex breakdowns. Only one category or one time series per question. Use column names from the schema. Output STRICT JSON only: { "questions": ["question1", "question2", "question3"] }. No markdown, no explanation, no code blocks.`
+Do NOT suggest phrases that need two dimensions, crosstabs, or complex breakdowns. Only one category or one time series per phrase. Use column names from the schema. Output STRICT JSON only: { "questions": ["phrase1", "phrase2", "phrase3"] }. No markdown, no explanation, no code blocks.`
 
 export const EXPLAINER_SYSTEM = `You are a data analyst writing a short explanation of computed results.
 
