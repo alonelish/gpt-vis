@@ -19,7 +19,7 @@ async function onFileChange(e: Event) {
   try {
     const form = new FormData()
     form.append('file', file)
-    const res = await $fetch<{ id: string; rowCount: number }>('/api/datasets', {
+    const res = await $fetch<{ id: string, rowCount: number }>('/api/datasets', {
       method: 'POST',
       body: form
     })

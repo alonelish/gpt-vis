@@ -29,7 +29,7 @@ function scrollToBottom() {
 }
 
 function hasRealMessages(): boolean {
-  return messages.value.some((m) => m.role === 'user' || (m.role === 'assistant' && m.suggestedQuestions == null))
+  return messages.value.some(m => m.role === 'user' || (m.role === 'assistant' && m.suggestedQuestions == null))
 }
 
 async function handleUpload(e: Event) {
@@ -49,7 +49,7 @@ async function handleUpload(e: Event) {
   try {
     const form = new FormData()
     form.append('file', file)
-    const res = await $fetch<{ id: string; rowCount: number }>('/api/datasets', {
+    const res = await $fetch<{ id: string, rowCount: number }>('/api/datasets', {
       method: 'POST',
       body: form
     })
@@ -71,26 +71,26 @@ async function handleUpload(e: Event) {
         suggestedQuestions: suggestRes.questions
       })
     } catch (suggestErr: unknown) {
-      const suggestMsg =
-        suggestErr &&
-        typeof suggestErr === 'object' &&
-        'data' in suggestErr &&
-        typeof (suggestErr as { data: { message?: string } }).data?.message === 'string'
-          ? (suggestErr as { data: { message: string } }).data.message
-          : 'Could not load suggestions'
+      const suggestMsg
+        = suggestErr
+        && typeof suggestErr === 'object'
+        && 'data' in suggestErr
+        && typeof (suggestErr as { data: { message?: string } }).data?.message === 'string'
+        ? (suggestErr as { data: { message: string } }).data.message
+        : 'Could not load suggestions'
       messages.value.push({ role: 'assistant', text: suggestMsg })
     } finally {
       loading.value = false
       scrollToBottom()
     }
   } catch (err: unknown) {
-    const msg =
-      err &&
-      typeof err === 'object' &&
-      'data' in err &&
-      typeof (err as { data: { message?: string } }).data?.message === 'string'
-        ? (err as { data: { message: string } }).data.message
-        : 'Upload failed'
+    const msg
+      = err
+      && typeof err === 'object'
+      && 'data' in err
+      && typeof (err as { data: { message?: string } }).data?.message === 'string'
+      ? (err as { data: { message: string } }).data.message
+      : 'Upload failed'
     messages.value.push({ role: 'assistant', text: msg })
     scrollToBottom()
   } finally {
