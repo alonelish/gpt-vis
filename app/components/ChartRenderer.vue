@@ -22,7 +22,7 @@ function buildOption(): echarts.EChartsOption | null {
       series: [{
         type: 'pie',
         name: seriesName ?? yKey,
-        data: data.map((r) => ({ name: String(r[xKey] ?? ''), value: Number(r[yKey] ?? 0) }))
+        data: data.map(r => ({ name: String(r[xKey] ?? ''), value: Number(r[yKey] ?? 0) }))
       }]
     }
   }
@@ -30,27 +30,27 @@ function buildOption(): echarts.EChartsOption | null {
     return {
       ...base,
       tooltip: { trigger: 'axis' },
-      xAxis: { type: 'category', data: data.map((r) => String(r[xKey] ?? '')) },
+      xAxis: { type: 'category', data: data.map(r => String(r[xKey] ?? '')) },
       yAxis: { type: 'value' },
-      series: [{ type: 'bar', name: seriesName ?? yKey, data: data.map((r) => Number(r[yKey] ?? 0)) }]
+      series: [{ type: 'bar', name: seriesName ?? yKey, data: data.map(r => Number(r[yKey] ?? 0)) }]
     }
   }
   if (type === 'line') {
     return {
       ...base,
       tooltip: { trigger: 'axis' },
-      xAxis: { type: 'category', data: data.map((r) => String(r[xKey] ?? '')) },
+      xAxis: { type: 'category', data: data.map(r => String(r[xKey] ?? '')) },
       yAxis: { type: 'value' },
-      series: [{ type: 'line', name: seriesName ?? yKey, data: data.map((r) => Number(r[yKey] ?? 0)) }]
+      series: [{ type: 'line', name: seriesName ?? yKey, data: data.map(r => Number(r[yKey] ?? 0)) }]
     }
   }
   if (type === 'histogram') {
     return {
       ...base,
       tooltip: { trigger: 'axis' },
-      xAxis: { type: 'category', data: data.map((r) => String(r[xKey] ?? '')) },
+      xAxis: { type: 'category', data: data.map(r => String(r[xKey] ?? '')) },
       yAxis: { type: 'value' },
-      series: [{ type: 'bar', name: seriesName ?? yKey, data: data.map((r) => Number(r[yKey] ?? 0)) }]
+      series: [{ type: 'bar', name: seriesName ?? yKey, data: data.map(r => Number(r[yKey] ?? 0)) }]
     }
   }
   return null

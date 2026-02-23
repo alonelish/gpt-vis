@@ -8,7 +8,7 @@ const props = defineProps<{
 
 const question = ref('')
 const loading = ref(false)
-const messages = ref<Array<{ role: 'user' | 'assistant'; text: string; sql?: string; chartSpec?: ChatResponseSuccess['chartSpec']; data?: ChatResponseSuccess['data']; warnings?: string[] }>>([])
+const messages = ref<Array<{ role: 'user' | 'assistant', text: string, sql?: string, chartSpec?: ChatResponseSuccess['chartSpec'], data?: ChatResponseSuccess['data'], warnings?: string[] }>>([])
 const clarificationQuestion = ref<string | null>(null)
 
 async function submit() {
@@ -48,7 +48,6 @@ async function submit() {
     loading.value = false
   }
 }
-
 </script>
 
 <template>
