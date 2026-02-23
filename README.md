@@ -1,60 +1,57 @@
-# Nuxt Starter Template
+# GPT Visualizer
 
-[![Nuxt UI](https://img.shields.io/badge/Made%20with-Nuxt%20UI-00DC82?logo=nuxt&labelColor=020420)](https://ui.nuxt.com)
+Ask questions about your CSV data and get answers with charts. Upload a CSV, type a question, and see text answers plus bar, line, pie, and histogram visualizations.
 
-Use this template to get started with [Nuxt UI](https://ui.nuxt.com) quickly.
+## Requirements
 
-- [Live demo](https://starter-template.nuxt.dev/)
-- [Documentation](https://ui.nuxt.com/docs/getting-started/installation/nuxt)
+- Node.js 22+
+- npm
 
-<a href="https://starter-template.nuxt.dev/" target="_blank">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://ui.nuxt.com/assets/templates/nuxt/starter-dark.png">
-    <source media="(prefers-color-scheme: light)" srcset="https://ui.nuxt.com/assets/templates/nuxt/starter-light.png">
-    <img alt="Nuxt Starter Template" src="https://ui.nuxt.com/assets/templates/nuxt/starter-light.png" width="830" height="466">
-  </picture>
-</a>
+## Environment variables
 
-> The starter template for Vue is on https://github.com/nuxt-ui-templates/starter-vue.
+Create a `.env` file in the project root (or set these in your deployment environment):
 
-## Quick Start
-
-```bash [Terminal]
-npm create nuxt@latest -- -t github:nuxt-ui-templates/starter
-```
-
-## Deploy your own
-
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-name=starter&repository-url=https%3A%2F%2Fgithub.com%2Fnuxt-ui-templates%2Fstarter&demo-image=https%3A%2F%2Fui.nuxt.com%2Fassets%2Ftemplates%2Fnuxt%2Fstarter-dark.png&demo-url=https%3A%2F%2Fstarter-template.nuxt.dev%2F&demo-title=Nuxt%20Starter%20Template&demo-description=A%20minimal%20template%20to%20get%20started%20with%20Nuxt%20UI.)
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `OPENROUTER_API_KEY` | Yes | Your [OpenRouter](https://openrouter.ai) API key for LLM requests. |
+| `OPENROUTER_MODEL` | No | Model ID (e.g. `anthropic/claude-3.5-sonnet`). Defaults to `anthropic/claude-3.5-sonnet` if not set. |
 
 ## Setup
 
-Make sure to install the dependencies:
+Install dependencies:
 
 ```bash
-pnpm install
+npm install
 ```
 
-## Development Server
+## Development
 
-Start the development server on `http://localhost:3000`:
+Start the development server at `http://localhost:3000`:
 
 ```bash
-pnpm dev
+npm run dev
 ```
 
 ## Production
 
-Build the application for production:
+Build the application:
 
 ```bash
-pnpm build
+npm run build
 ```
 
-Locally preview production build:
+Preview the production build locally:
 
 ```bash
-pnpm preview
+npm run preview
 ```
 
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+## Scripts
+
+- `npm run dev` — Start dev server
+- `npm run build` — Build for production
+- `npm run preview` — Preview production build
+- `npm run lint` — Run ESLint
+- `npm run typecheck` — Run Nuxt typecheck
+
+See [Nuxt deployment docs](https://nuxt.com/docs/getting-started/deployment) for deployment options.
